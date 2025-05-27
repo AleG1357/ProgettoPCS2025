@@ -7,6 +7,7 @@ list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/ProjectionUtilities.hpp)
 list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/SolidGenerator.hpp)
 list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/GeodesicGenerator.hpp)
 list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/GeodesicSubdivision.hpp)
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/DualMeshGenerator.hpp)
 
 
 

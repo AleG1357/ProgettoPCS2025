@@ -5,6 +5,7 @@
 #include "SolidGenerator.hpp"
 #include "GeodesicGenerator.hpp"
 #include "GeodesicSubdivision.hpp"
+#include "DualMeshGenerator.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -28,25 +29,69 @@ int main(int argc, char** argv)
     int b = stoi(argv[3]);
     int c = stoi(argv[4]);
 
-    if ((p != 3 && p != 4) || q < 3 || b < 0 || c < 0 || (b > 0 && c > 0))
+    if ((p != 3 && p != 4 && p != 5) || q < 3 || b < 0 || c < 0 || (b > 0 && c > 0))
     {
-        cerr << "Input non valido. Deve essere p = 3 e (b = 0 o c = 0)." << endl;
+        cerr << "Input non valido. p ∈ {3,4,5}, q ≥ 3, b ≥ 0, c ≥ 0, ma non entrambi > 0." << endl;
         return 1;
     }
 
     PolyhedralMesh mesh;
 
-    // === Riconoscimento e generazione ===
-    if (b == 0 && c == 0)
-    {
-        DetectAndGeneratePlatonic(mesh, p, q);
-    }
-    else
+    // === CASO 1: p = 3 → geodesico (classe I)
+    if (p == 3)
     {
         GenerateGeodesicPolyhedronClassI(mesh, p, q, b + c);
     }
 
-    // === Esportazione .txt ===
+    // === CASO 2: q = 3 → poliedro di Goldberg (duale)
+    else if (q == 3)
+    {
+       /*/ // eccezione: tetraedro → duale è se stesso
+        if (p == 3 && q == 3)
+        {                                 Ho commentato perchè per ora è ridondante
+            GenerateTetrahedron(mesh);  
+        }
+        else
+        {*/       
+            // costruiamo il geodetico con p e q invertiti
+            PolyhedralMesh base;
+            GenerateGeodesicPolyhedronClassI(base, std::min(p, q), std::max(p, q), b + c);
+            GenerateDualMesh(base, mesh);
+        //}
+    }
+
+
+    // === RIMOZIONE DUPLICATI ===
+    RemoveDuplicateVertices(mesh);
+    RemoveDuplicateEdges(mesh);
+
+    // === CHECK NUMERI TEORICI (debug)
+    int T = b * b + b * c + c * c;
+    int expectedV = 0, expectedE = 0, expectedF = 0;
+
+    if (q == 3) {
+        expectedV = 2 * T + 2;
+        expectedE = 6 * T;
+        expectedF = 4 * T;
+    } else if (q == 4) {
+        expectedV = 4 * T + 2;
+        expectedE = 12 * T;
+        expectedF = 8 * T;
+    } else if (q == 5) {
+        expectedV = 10 * T + 2;
+        expectedE = 30 * T;
+        expectedF = 20 * T;
+    }
+
+    std::cout << "🔍 Verifica struttura mesh:" << std::endl;
+    std::cout << "   Attesi: V=" << expectedV << " E=" << expectedE << " F=" << expectedF << std::endl;
+    std::cout << "   Ottenuti: V=" << mesh.NumCell0Ds << " E=" << mesh.NumCell1Ds << " F=" << mesh.NumCell2Ds << std::endl;
+
+
+
+
+
+    // === ESPORTAZIONE .txt
     ofstream f0("Cell0Ds.txt");
     for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i)
         f0 << mesh.Cell0DsId[i] << " "
@@ -98,12 +143,12 @@ int main(int argc, char** argv)
     f3 << "\n";
     f3.close();
 
-    // === .inp opzionale per Paraview ===
+    // === ESPORTAZIONE .inp
     UCDUtilities exporter;
     exporter.ExportPoints("Cell0Ds.inp", mesh.Cell0DsCoordinates);
     exporter.ExportSegments("Cell1Ds.inp", mesh.Cell0DsCoordinates, mesh.Cell1DsExtrema);
     exporter.ExportPolygons("Cell2Ds.inp", mesh.Cell0DsCoordinates, mesh.Cell2DsVertices);
 
-    cout << "Solido generato con successo. File .txt e .inp pronti." << endl;
+    cout << "✅ Solido generato. File .txt e .inp pronti." << endl;
     return 0;
 }

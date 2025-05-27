@@ -63,4 +63,87 @@ void AddCell2D(PolyhedralMesh& mesh, const std::vector<unsigned int>& vertexIDs)
     mesh.NumCell2Ds = id + 1;
 }
 
+
+void RemoveDuplicateVertices(PolyhedralMesh& mesh, double epsilon = 1e-6)
+{
+    std::vector<int> oldToNew(mesh.NumCell0Ds, -1);
+    std::vector<Eigen::Vector3d> newCoords;
+    std::vector<unsigned int> newIds;
+
+    for (unsigned int i = 0; i < mesh.NumCell0Ds; ++i)
+    {
+        Eigen::Vector3d pi = mesh.Cell0DsCoordinates.col(i);
+        bool found = false;
+        for (unsigned int j = 0; j < newCoords.size(); ++j)
+        {
+            if ((pi - newCoords[j]).norm() < epsilon)
+            {
+                oldToNew[i] = j;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            oldToNew[i] = newCoords.size();
+            newCoords.push_back(pi);
+            newIds.push_back(mesh.Cell0DsId[i]);
+        }
+    }
+
+    mesh.Cell0DsCoordinates.resize(3, newCoords.size());
+    for (unsigned int i = 0; i < newCoords.size(); ++i)
+        mesh.Cell0DsCoordinates.col(i) = newCoords[i];
+
+    mesh.Cell0DsId = newIds;
+    mesh.NumCell0Ds = newCoords.size();
+
+    for (int i = 0; i < mesh.Cell1DsExtrema.cols(); ++i)
+    {
+        mesh.Cell1DsExtrema(0, i) = oldToNew[mesh.Cell1DsExtrema(0, i)];
+        mesh.Cell1DsExtrema(1, i) = oldToNew[mesh.Cell1DsExtrema(1, i)];
+    }
+
+    for (auto& verts : mesh.Cell2DsVertices)
+    {
+        for (auto& v : verts)
+            v = oldToNew[v];
+    }
+}
+
+
+
+void RemoveDuplicateEdges(PolyhedralMesh& mesh)
+{
+    std::vector<unsigned int> newIds;
+    std::vector<Eigen::Vector2i> newEdges;
+    std::map<std::pair<int, int>, int> edgeMap;
+
+    for (int i = 0; i < mesh.Cell1DsExtrema.cols(); ++i)
+    {
+        int a = mesh.Cell1DsExtrema(0, i);
+        int b = mesh.Cell1DsExtrema(1, i);
+        if (a > b) std::swap(a, b);
+
+        auto key = std::make_pair(a, b);
+        if (edgeMap.find(key) == edgeMap.end())
+        {
+            edgeMap[key] = static_cast<int>(newEdges.size());
+            newIds.push_back(mesh.Cell1DsId[i]);
+            newEdges.emplace_back(a, b);
+        }
+    }
+
+    mesh.Cell1DsExtrema.resize(2, newEdges.size());
+
+    for (unsigned int i = 0; i < newEdges.size(); ++i)
+    {
+        mesh.Cell1DsExtrema(0, i) = newEdges[i][0];  // ✅ PRIMO vertice (origin)
+        mesh.Cell1DsExtrema(1, i) = newEdges[i][1];  // ✅ SECONDO vertice (end)
+    }
+
+    mesh.Cell1DsId = newIds;
+    mesh.NumCell1Ds = static_cast<int>(newEdges.size());
+}
+
 }

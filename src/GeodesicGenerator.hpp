@@ -35,5 +35,3 @@ void GenerateGeodesicPolyhedronClassI(PolyhedralMesh& mesh, int p, int q, int b)
 }
 
 }
-
-

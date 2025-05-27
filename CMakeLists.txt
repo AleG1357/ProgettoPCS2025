@@ -68,7 +68,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${${CMAKE_PROJECT_NAME}_includ
 target_link_libraries(${PROJECT_NAME} PUBLIC ${${PROJECT_NAME}_LINKED_LIBRARIES})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 
-add_executable(${PROJECT_NAME}_TEST main_test.cpp
+add_executable(${PROJECT_NAME}_TEST main_test.cpp 
       ${${PROJECT_NAME}_TEST_sources}
       ${${PROJECT_NAME}_TEST_headers})
 
