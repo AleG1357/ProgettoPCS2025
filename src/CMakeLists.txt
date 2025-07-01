@@ -1,17 +1,12 @@
-# message("SUBFOLDER:")
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Polyhedron.hpp)
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Utils.hpp)
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Geometry.hpp)
+list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/Triangle.hpp)
 
-
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/PolyhedralMesh.hpp)
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/PolyhedralMeshBuilder.hpp)
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/ProjectionUtilities.hpp)
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/SolidGenerator.hpp)
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/GeodesicGenerator.hpp)
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/GeodesicSubdivision.hpp)
-list(APPEND src_headers ${CMAKE_CURRENT_SOURCE_DIR}/DualMeshGenerator.hpp)
-
-
-
-#list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Pippo.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Utils.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Triangle.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Geometry.cpp)
+list(APPEND src_sources ${CMAKE_CURRENT_SOURCE_DIR}/Graph.cpp)
 
 list(APPEND src_includes ${CMAKE_CURRENT_SOURCE_DIR})
 

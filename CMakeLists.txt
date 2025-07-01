@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-# ProgettoPCS2025 is the project name
-project(ProgettoPCS2025 LANGUAGES C CXX VERSION 1.0.0)
+project(Progetto LANGUAGES C CXX VERSION 1.0.0)
 
 # Set C++ Standard
 ################################################################################
@@ -16,7 +15,7 @@ if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
 endif (WIN32)
 
-# Add dependencies
+# Add dependencies (= collegamenti con librerie esterne)
 ################################################################################
 
 ## Eigen3
@@ -35,10 +34,6 @@ list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PRIVATE GTest::gtest_main)
 list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PRIVATE GTest::gmock)
 list(APPEND ${PROJECT_NAME}_LINKED_LIBRARIES PRIVATE GTest::gmock_main)
 
-################################################################################
-
-
-
 ###################### Add subdirectory ##################################
 add_subdirectory(src)
 add_subdirectory(src_test)
@@ -52,13 +47,7 @@ list(APPEND ${PROJECT_NAME}_TEST_sources ${${PROJECT_NAME}_sources} ${src_test_s
 list(APPEND ${PROJECT_NAME}_TEST_headers ${${PROJECT_NAME}_headers} ${src_test_headers})
 list(APPEND ${PROJECT_NAME}_TEST_includes ${${PROJECT_NAME}_includes} ${src_test_includes})
 
-#################### Copy file ################################
-
-#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ListPolygons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 ############################## Add executable ##################################################
-
-# Add two executables: ProgettoPCS2025 and ProgettoPCS2025_TEST
 
 add_executable(${PROJECT_NAME} main.cpp
       ${${PROJECT_NAME}_sources}
@@ -68,11 +57,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${${CMAKE_PROJECT_NAME}_includ
 target_link_libraries(${PROJECT_NAME} PUBLIC ${${PROJECT_NAME}_LINKED_LIBRARIES})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 
-add_executable(${PROJECT_NAME}_TEST main_test.cpp 
+add_executable(${PROJECT_NAME}_TEST main_test.cpp
       ${${PROJECT_NAME}_TEST_sources}
       ${${PROJECT_NAME}_TEST_headers})
 
 target_include_directories(${PROJECT_NAME}_TEST PUBLIC ${${CMAKE_PROJECT_NAME}_TEST_includes})
 target_link_libraries(${PROJECT_NAME}_TEST PUBLIC ${${PROJECT_NAME}_LINKED_LIBRARIES})
 target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)
-
