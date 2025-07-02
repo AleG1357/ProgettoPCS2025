@@ -6,27 +6,21 @@
 #include "Polyhedron.hpp"
 
 
-// Graph struct containing the adjacency matrix
-struct Graph
-{
-    vector<list<unsigned int>> adjacencyList;
+// Struttura grafo: lista di adiacenza (più efficiente per BFS/Dijkstra)
+struct Graph {
+    std::vector<std::vector<unsigned int>> adjacencyList;
 };
 
 
-// Function which creates the graph 
-Graph createGraph(const Polyhedron& pol);
+// Costruzione grafo e pesi
+Graph buildAdjacencyGraph(const Polyhedron& poly);
+MatrixXd buildEdgeWeightMatrix(const Polyhedron& poly);
 
-// Function which creates the weights matrix
-MatrixXd createWeights(const Polyhedron& pol);
+// Algoritmi di cammino minimo
+std::vector<unsigned int> dijkstraPath(const Graph& g, unsigned int start, unsigned int end, const MatrixXd& W);
+std::vector<unsigned int> bfsPath(const Graph& g, unsigned int start, unsigned int end);
+std::vector<unsigned int> findShortestPath(const Graph& g, unsigned int start, unsigned int end, bool isUniformEdgeLength, const MatrixXd& W);
 
-// Function which finds the shortest path using Diskstra's algorithm
-vector<unsigned int> Dijkstra(const Graph& graph,
-                                const unsigned int& id_path_start,
-                                const unsigned int& id_path_end,
-                                const MatrixXd& weights);
-
-// Function which prints the path in the terminal
-void printPath(Polyhedron& pol, const vector<unsigned int> path);
-
-// Function which draws the path on the polyhedron
-void drawPath(Polyhedron& pol, const vector<unsigned int> path);
+// Output e visualizzazione
+void printPath(const Polyhedron& poly, const std::vector<unsigned int>& path);
+void highlightPath(Polyhedron& poly, const std::vector<unsigned int>& path);

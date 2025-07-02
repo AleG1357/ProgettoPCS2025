@@ -13,7 +13,7 @@ using namespace Eigen;
 struct Vertex
 {
 	unsigned int id = 0;
-	Vector3d coords =Vector3d::Zero();
+	Vector3d coords = Vector3d::Zero();
 	vector<unsigned int> edgeNeighbors{}; // IDs of adjacent edges
 	vector<unsigned int> faceNeighbors{}; // IDs of adjacent faces
 	bool shortPath = false; /// per evidenziare i cammini minimi

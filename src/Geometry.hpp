@@ -1,23 +1,18 @@
 #pragma once
 
-#include <map>
-#include <algorithm>
-
 #include "Polyhedron.hpp"
 
 
-// Function which normalizes the vertices (Geometry.cpp)
-void normalizeVertex(Vertex& v);
+// Proietta un vertice sulla sfera unitaria (Geometry.cpp)
+void projectOnUnitSphere(Vertex& v);
 
+// Calcola il centroide di una faccia (Geometry.cpp)
+Vertex faceCentroid(const Polyhedron& poly, unsigned int faceId);
 
-// Function which computes the barycenter of a face (Geometry.cpp)
-Vertex Barycenter(const Polyhedron& P, const unsigned int& f_id);
+// Assegna le adiacenze tra edge e facce
+void assignEdgeAdjacencies(Polyhedron& poly);
+// Assegna le adiacenze tra vertici, edge e facce
+void assignVertexAdjacencies(Polyhedron& poly);
 
-
-// Functions which find the neighbors of each edge and vertex
-void getEdgeNeighbors(Polyhedron& P);
-void getVertexNeighbors(Polyhedron& P);
-
-
-// Function which creates the dual of the polyhedron (Geometry.cpp)
-Polyhedron Dual(const Polyhedron& P);
+// Costruisce il poliedro duale
+Polyhedron makeDualPolyhedron(const Polyhedron& poly);

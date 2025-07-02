@@ -6,13 +6,16 @@
 #include "Polyhedron.hpp"
 
 
-// Function which checks if the new vertex already exists
-unsigned int addVertexIfMissing(Polyhedron& P, const Vector3d coords_V);
+// Funzione che aggiunge un vertice solo se non già presente
+unsigned int addVertexIfMissing(Polyhedron& poly, const Vector3d& coords);
 
-// Function which checks if the new edge already exists 
-unsigned int addEdgeIfMissing(Polyhedron& P, unsigned int id1, unsigned int id2,
-							  unsigned int id_e = numeric_limits<unsigned int>::max());
+// Funzione che aggiunge un edge solo se non già presente
+unsigned int addEdgeIfMissing(Polyhedron& poly, unsigned int id1, unsigned int id2, unsigned int forced_id);
+// Overload per chiamate senza forced_id (comportamento di default)
+inline unsigned int addEdgeIfMissing(Polyhedron& poly, unsigned int id1, unsigned int id2) {
+	return addEdgeIfMissing(poly, id1, id2, numeric_limits<unsigned int>::max());
+}
 
-// Functions for Class I and Class II triangulation of a polyhedron
+// Triangolazione Class I e II di un poliedro
 Polyhedron TriangleClassI(const Polyhedron& P_old, const unsigned int& val);
 Polyhedron TriangleClassII(const Polyhedron& P_old, const unsigned int& val);
