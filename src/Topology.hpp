@@ -4,15 +4,15 @@
 
 
 // Proietta un vertice sulla sfera unitaria (Geometry.cpp)
-void projectOnUnitSphere(Vertex& v);
+void project_on_unit_sphere(Vertex& v);
 
 // Calcola il centroide di una faccia (Geometry.cpp)
-Vertex faceCentroid(const Polyhedron& poly, unsigned int faceId);
+Vertex face_centroid(const Polyhedron& poly, unsigned int face_id);
 
 // Assegna le adiacenze tra edge e facce
-void assignEdgeAdjacencies(Polyhedron& poly);
+void assign_edge_adjacencies(Polyhedron& poly);
 // Assegna le adiacenze tra vertici, edge e facce
-void assignVertexAdjacencies(Polyhedron& poly);
+void assign_vertex_adjacencies(Polyhedron& poly);
 
 // Costruisce il poliedro duale
-Polyhedron makeDualPolyhedron(const Polyhedron& poly);
+Polyhedron dual_polyhedron(const Polyhedron& poly);

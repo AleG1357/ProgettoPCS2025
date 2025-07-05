@@ -9,51 +9,49 @@ using namespace std;
 using namespace Eigen;
 
 
-// Struct which stores the ID and coordinates of a vertex
+// Struttura che memorizza l'ID e le coordinate di un vertice
 struct Vertex
 {
 	unsigned int id = 0;
 	Vector3d coords = Vector3d::Zero();
-	vector<unsigned int> edgeNeighbors{}; // IDs of adjacent edges
-	vector<unsigned int> faceNeighbors{}; // IDs of adjacent faces
-	bool shortPath = false; /// per evidenziare i cammini minimi
-
-	//
+	vector<unsigned int> edge_adjacencies{}; // ID degli spigoli adiacenti
+	vector<unsigned int> face_adjacencies{}; // ID delle facce adiacenti
+	bool short_path = false; // Per evidenziare i cammini minimi
 };
 
-// Struct which stores the ID of an edge and the IDs of its extrema
+// Struttura che memorizza l'ID di uno spigolo e gli ID dei suoi estremi
 struct Edge
 {
 	unsigned int id = 0;
 	unsigned int origin = 0;
 	unsigned int end = 0;
-	vector<unsigned int> faceNeighbors{}; // IDs of adjacent faces
-	bool shortPath = false;
+	vector<unsigned int> face_adjacencies{}; // ID delle facce adiacenti
+	bool short_path = false;
 };
 
-// Struct which stores the ID of a face, the IDs of its vertices and edges
-	// and the number of vertices and edges
+// Struttura che memorizza l'ID di una faccia, gli ID dei suoi vertici e spigoli
+// e il numero di vertici e spigoli
 struct Face
 {
 	unsigned int id = 0;
-	vector<unsigned int> idVertices{};
-	vector<unsigned int> idEdges{};
+	vector<unsigned int> id_vertices{};
+	vector<unsigned int> id_edges{};
 
-	// Method which returns the number of vertices of the face
-	unsigned int numVertices() const
+	// Restituisce il numero di vertici della faccia
+	unsigned int n_vertices() const
 	{
-		return idVertices.size();
+		return id_vertices.size();
 	}
 
-	// Method which returns the number of edges of the face
-	unsigned int numEdges() const
+	// Restituisce il numero di spigoli della faccia
+	unsigned int n_edges() const
 	{
-		return idEdges.size();
+		return id_edges.size();
 	}
 };
 
-// Struct which stores the ID of a polyhedron, the IDs of its vertices and edges
-// and the number of vertices, edges and faces
+// Struttura che memorizza l'ID di un poliedro, gli ID dei suoi vertici, spigoli e facce
+// e il numero di vertici, spigoli e facce
 struct Polyhedron
 {
 	unsigned int id = 0;
@@ -61,78 +59,76 @@ struct Polyhedron
 	vector<Edge> edges{};
 	vector<Face> faces{};
 
-	// Method which returns the number of vertices of the polyhedron
-	unsigned int numVertices() const
+	// Restituisce il numero di vertici del poliedro
+	unsigned int n_vertices() const
 	{
 		return vertices.size();
 	}
 
-	// Method which returns the number of edges of the polyhedron
-	unsigned int numEdges() const
+	// Restituisce il numero di spigoli del poliedro
+	unsigned int n_edges() const
 	{
 		return edges.size();
 	}
 
-	// Method which returns the number of faces of the polyhedron
-	unsigned int numFaces() const
+	// Restituisce il numero di facce del poliedro
+	unsigned int n_faces() const
 	{
 		return faces.size();
 	}
 
-	// Method which checks if the vertices and edges of each face are coherent
-	bool checkFaces() const
+	// Controlla che i vertici e gli spigoli di ogni faccia siano coerenti
+	bool check_faces() const
 	{
-		// Iterate through all faces of the polyhedron
+		// Itera su tutte le facce del poliedro
 		for (const auto& face : faces)
 		{
-			// Get number of edges and vertices
-			// (for this project we expect this value to be always 3)
-			unsigned int E = face.numEdges();
-			unsigned int V = face.numVertices();
+			// Ottieni il numero di spigoli e vertici (ci si aspetta sempre 3)
+			unsigned int E = face.n_edges();
+			unsigned int V = face.n_vertices();
 
-			// Check if they are the same
+			// Controlla che siano uguali
 			if(E != V)
 			{
-				cerr << "Mismatch number of edges and vertices" << endl;
+				cerr << "Numero di spigoli e vertici non corrispondente" << endl;
 				return false;
 			}
 
-			// Iterate along each vector of IDs
+			// Itera su ciascun ID
 			for (size_t e = 0; e < E; ++e)
 			{
-				// Get IDs of the e-th edge and vertex, and the e-th edge
-				unsigned int idEdge = face.idEdges[e];
-				unsigned int idVertex = face.idVertices[e];
+				// Ottieni l'ID dello spigolo e del vertice corrente
+				unsigned int id_edge = face.id_edges[e];
+				unsigned int id_vertex = face.id_vertices[e];
 
-				// Get e-th edge
-				const Edge& edge = edges[idEdge];
+				// Ottieni lo spigolo corrente
+				const Edge& edge = edges[id_edge];
 
-				// The ID of the e-th vertex must be either the origin or the end
-				// of the e-th edge
-				if (edge.origin != idVertex && edge.end != idVertex)
+				// L'ID del vertice deve essere uno degli estremi dello spigolo
+				if (edge.origin != id_vertex && edge.end != id_vertex)
 				{
-					cerr << "Error: vertex-edge mismatch" << endl;
+					cerr << "Errore: vertice e spigolo non corrispondenti" << endl;
 					return false;
 				}
 
-				// Get ID of the (e+1)-th vertex
-				unsigned int idVertexNext = face.idVertices[(e + 1) % E];
+				// Ottieni l'ID del vertice successivo
+				unsigned int id_vertex_next = face.id_vertices[(e + 1) % E];
 				
-				// Get ID of the end of the e-th edge
-				unsigned int currentEdgeEnd;
-				if (edge.origin == idVertex)
+				// Ottieni l'estremo dello spigolo
+				unsigned int current_edge_end;
+				if (edge.origin == id_vertex)
 				{
-					currentEdgeEnd = edge.end;
+					current_edge_end = edge.end;
 				}
 				else
 				{
-					currentEdgeEnd = edge.origin;
+					current_edge_end = edge.origin;
 				}
 
-				// The ID of the (e+1)-th vertex must be the end of the e-th edge
-				if (currentEdgeEnd != idVertexNext)
+				// L'ID del vertice successivo deve essere l'estremo dello spigolo
+				if (current_edge_end != id_vertex_next)
 				{
-					cerr << "Error: edge-edge discontinuity" << endl;
+					cerr << "Errore: discontinuità tra spigoli" << endl;
 					return false;
 				}
 			}

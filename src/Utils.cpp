@@ -4,7 +4,7 @@
 #include <numbers>
 
 #include "Utils.hpp"
-#include "Geometry.hpp"
+#include "Topology.hpp"
 #include "Polyhedron.hpp"
 
 
@@ -13,7 +13,7 @@ using namespace Eigen;
 
 
 
-Polyhedron buildPlatonicSolid(int p, int q)
+Polyhedron build_platonic_solid(int p, int q)
 {
 	Polyhedron solid;
 	
@@ -33,6 +33,7 @@ Polyhedron buildPlatonicSolid(int p, int q)
 			{2, {0,2,3}},
 			{3, {1,3,2}}
 		};
+		cout << " Poliedro di partenza: Tetraedro ( p = 3 e q = 3 )" << endl << endl;
 	}    
 
 	else if ((p == 3 && q == 4) || (p == 4 && q == 3 )) // cubo e ottaedro 
@@ -47,6 +48,9 @@ Polyhedron buildPlatonicSolid(int p, int q)
 				{0, {0,2,4}}, {1, {2,1,4}}, {2, {1,3,4}}, {3, {3,0,4}},
 				{4, {2,0,5}}, {5, {1,2,5}}, {6, {3,1,5}}, {7, {0,3,5}}
 			};
+
+			if (p == 3){ cout << " Poliedro di partenza: Ottaedro ( p = 3 e q = 4 )" << endl << endl; }
+			else { cout << " Poliedro di partenza: Cubo ( p = 4 e q = 3 )" << endl << endl; }
 		}
 
 	else if ((p == 3 && q == 5) || (p == 5 && q == 3)) //dodecaedro e icosaedro
@@ -70,38 +74,41 @@ Polyhedron buildPlatonicSolid(int p, int q)
 				{14,{9,11,7}}, {15,{7,11,3}}, {16,{7,3,6}}, {17,{6,3,10}},
 				{18,{10,3,2}}, {19,{2,3,11}}
 			};
+
+			if (p == 3){ cout << " Poliedro di partenza: Icosaedro ( p = 3 e q = 5 )" << endl << endl; }
+			else { cout << " Poliedro di partenza: Dodecaedro ( p = 5 e q = 3 )" << endl << endl; }
 		}
 
 		else {
-			throw std::runtime_error("Solido non supportato.");
+			throw std::runtime_error(" Solido non supportato. ");
 	}
 
 	// COSTRUZIONE PRECISA E CHIARA DEI LATI (SPIGOLI):
 	map<pair<unsigned int,unsigned int>, unsigned int> edgeIndexMap;
-	unsigned int edgeId = 0;
+	unsigned int edge_id = 0;
 
 	for (auto& face : solid.faces)
 	{
-		face.idEdges.clear();
+		face.id_edges.clear();
 
-		for (unsigned int j=0; j<face.idVertices.size(); ++j)
+		for (unsigned int j=0; j<face.id_vertices.size(); ++j)
 		{
-			unsigned int vStart = face.idVertices[j];
-			unsigned int vEnd = face.idVertices[(j+1)%3];
+			unsigned int v_start = face.id_vertices[j];
+			unsigned int v_end = face.id_vertices[(j+1)%3];
 
-			pair<unsigned int,unsigned int> currentEdge = minmax(vStart, vEnd);
+			pair<unsigned int,unsigned int> current_edge = minmax(v_start, v_end);
 
 			// Se il lato non esiste, lo creo
-			if(edgeIndexMap.find(currentEdge) == edgeIndexMap.end())
+			if(edgeIndexMap.find(current_edge) == edgeIndexMap.end())
 			{
-				solid.edges.push_back({edgeId, currentEdge.first, currentEdge.second});
-				edgeIndexMap[currentEdge] = edgeId;
-				face.idEdges.push_back(edgeId);
-				edgeId++;
+				solid.edges.push_back({edge_id, current_edge.first, current_edge.second});
+				edgeIndexMap[current_edge] = edge_id;
+				face.id_edges.push_back(edge_id);
+				edge_id++;
 			}
 			else
 			{
-				face.idEdges.push_back(edgeIndexMap[currentEdge]);
+				face.id_edges.push_back(edgeIndexMap[current_edge]);
 			}
 		}
 	}
@@ -112,18 +119,18 @@ Polyhedron buildPlatonicSolid(int p, int q)
 
 
 
-// Function which allows to export a polyhedron for Paraview
-void exportPolyhedron(const Polyhedron& P)
+// Funzione che permette l'esportazione di un poliedro su Paraview
+void export_polyhedron(const Polyhedron& P)
 {   
-	//cout << ">>> Entrato in exportPolyhedron" << endl;
+	//cout << ">>> Entrato in export_polyhedron" << endl;
 
 	// Matrice coordinate vertici
-	MatrixXd coordsCell0D = MatrixXd::Zero(3, P.numVertices());
+	MatrixXd coordsCell0D = MatrixXd::Zero(3, P.n_vertices());
 	for (const auto& v : P.vertices)
 		coordsCell0D.col(v.id) = v.coords;
 
 	// Matrice estremi degli edge
-	MatrixXi extremaCell1D = MatrixXi::Zero(2, P.numEdges());
+	MatrixXi extremaCell1D = MatrixXi::Zero(2, P.n_edges());
 	for (unsigned int i = 0; i < P.edges.size(); ++i) {
 		extremaCell1D(0, i) = P.edges[i].origin;
 		extremaCell1D(1, i) = P.edges[i].end;
@@ -134,9 +141,9 @@ void exportPolyhedron(const Polyhedron& P)
 	// Highlight path on the polyhedron
 
 	// Vettore per evidenziare i vertici sul cammino
-	vector<double> visitedNodes(P.numVertices(), 0.0);
-	for (unsigned int i = 0; i < P.numVertices(); ++i)
-		visitedNodes[i] = P.vertices[i].shortPath ? 1.0 : 0.0;
+	vector<double> visitedNodes(P.n_vertices(), 0.0);
+	for (unsigned int i = 0; i < P.n_vertices(); ++i)
+		visitedNodes[i] = P.vertices[i].short_path ? 1.0 : 0.0;
 
 	// Initialize UCDProperty struct
 	Gedim::UCDProperty<double> visitedNodes_UCD;
@@ -152,9 +159,9 @@ void exportPolyhedron(const Polyhedron& P)
 
 
 	// Vettore per evidenziare gli edge sul cammino
-	vector<double> visitedEdges(P.numEdges(), 0.0);
-	for (unsigned int i = 0; i < P.numEdges(); ++i)
-		visitedEdges[i] = P.edges[i].shortPath ? 1.0 : 0.0;
+	vector<double> visitedEdges(P.n_edges(), 0.0);
+	for (unsigned int i = 0; i < P.n_edges(); ++i)
+		visitedEdges[i] = P.edges[i].short_path ? 1.0 : 0.0;
 
 
 
@@ -188,12 +195,12 @@ void exportPolyhedron(const Polyhedron& P)
 
 
 // Function which writes output files in the requested format
-bool writeOutput(const Polyhedron& P)
+bool write_output(const Polyhedron& P)
 {
 	// Esporta i vertici (0D)
 	ofstream ofs_cell0D("Cell0Ds.txt");
 	if (!ofs_cell0D) {
-		cerr << "File Cell0Ds.txt cannot be created." << endl;
+		cerr << "Errore nella creazione del file Cell0Ds.txt ." << endl;
 		return false;
 	}
 	ofs_cell0D << "id;X;Y;Z" << endl;
@@ -205,7 +212,7 @@ bool writeOutput(const Polyhedron& P)
 	// Esporta gli edge (1D)
 	ofstream ofs_cell1D("Cell1Ds.txt");
 	if (!ofs_cell1D) {
-		cerr << "File Cell1Ds.txt cannot be created." << endl;
+		cerr << "Errore nella creazione del file Cell1Ds.txt ." << endl;
 		return false;
 	}
 	ofs_cell1D << "id;origin;end" << endl;
@@ -217,18 +224,18 @@ bool writeOutput(const Polyhedron& P)
 	// Esporta le facce (2D)
 	ofstream ofs_cell2D("Cell2Ds.txt");
 	if (!ofs_cell2D) {
-		cerr << "File Cell2Ds.txt cannot be created." << endl;
+		cerr << "Errore nella creazione del file Cell2Ds.txt ." << endl;
 		return false;
 	}
 	ofs_cell2D << "id;NumVertices;Vertices;NumEdges;Edges" << endl;
 	for (const auto& f : P.faces) {
-		ofs_cell2D << f.id << ";" << f.numVertices() << ";";
-		for (unsigned int i = 0; i < f.numVertices(); ++i)
-			ofs_cell2D << f.idVertices[i] << ";";
-		ofs_cell2D << f.numEdges() << ";";
-		for (unsigned int i = 0; i < f.numEdges(); ++i) {
-			ofs_cell2D << f.idEdges[i];
-			if (i < f.numEdges() - 1) ofs_cell2D << ";";
+		ofs_cell2D << f.id << ";" << f.n_vertices() << ";";
+		for (unsigned int i = 0; i < f.n_vertices(); ++i)
+			ofs_cell2D << f.id_vertices[i] << ";";
+		ofs_cell2D << f.n_edges() << ";";
+		for (unsigned int i = 0; i < f.n_edges(); ++i) {
+			ofs_cell2D << f.id_edges[i];
+			if (i < f.n_edges() - 1) ofs_cell2D << ";";
 		}
 		ofs_cell2D << endl;
 	}
@@ -238,20 +245,20 @@ bool writeOutput(const Polyhedron& P)
 	// Esporta il solido (3D)
 	ofstream ofs_cell3D("Cell3Ds.txt");
 	if (!ofs_cell3D) {
-		cerr << "File Cell3Ds.txt cannot be created." << endl;
+		cerr << "Errore nella creazione del file Cell3Ds.txt ." << endl;
 		return false;
 	}
 	ofs_cell3D << "id;NumVertices;Vertices;NumEdges;Edges;NumFaces;Faces" << endl;
-	ofs_cell3D << P.id << ";" << P.numVertices() << ";";
-	for (unsigned int i = 0; i < P.numVertices(); ++i)
+	ofs_cell3D << P.id << ";" << P.n_vertices() << ";";
+	for (unsigned int i = 0; i < P.n_vertices(); ++i)
 		ofs_cell3D << P.vertices[i].id << ";";
-	ofs_cell3D << P.numEdges() << ";";
-	for (unsigned int i = 0; i < P.numEdges(); ++i)
+	ofs_cell3D << P.n_edges() << ";";
+	for (unsigned int i = 0; i < P.n_edges(); ++i)
 		ofs_cell3D << P.edges[i].id << ";";
-	ofs_cell3D << P.numFaces() << ";";
-	for (unsigned int i = 0; i < P.numFaces(); ++i) {
+	ofs_cell3D << P.n_faces() << ";";
+	for (unsigned int i = 0; i < P.n_faces(); ++i) {
 		ofs_cell3D << P.faces[i].id;
-		if (i < P.numFaces() - 1) ofs_cell3D << ";";
+		if (i < P.n_faces() - 1) ofs_cell3D << ";";
 	}
 	ofs_cell3D << endl;
 	ofs_cell3D.close();

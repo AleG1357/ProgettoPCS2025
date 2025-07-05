@@ -1,9 +1,9 @@
 #include <iostream>
 
 #include "Utils_test.hpp"
-#include "Geometry_test.hpp"
-#include "Triangle_test.hpp"
-#include "Graph_test.hpp"
+#include "Topology_test.hpp"
+#include "Triangulation_test.hpp"
+#include "ShortPath_test.hpp"
 
 #include <gtest/gtest.h>
 

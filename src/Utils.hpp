@@ -6,10 +6,10 @@
 using namespace std;
 using namespace Eigen;
 
-Polyhedron buildPlatonicSolid(int p, int q);
+Polyhedron build_platonic_solid(int p, int q);
 
 // Function which exports the polyhedron for Paraview
-void exportPolyhedron(const Polyhedron& P);
+void export_polyhedron(const Polyhedron& P);
 
 // Function which writes the output
-bool writeOutput(const Polyhedron& P);
+bool write_output(const Polyhedron& P);
